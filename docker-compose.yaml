@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  #PHP Service
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        user: ${WORKSPACE_USER}
+        uid: 1000
+        php_version: ${WORKSPACE_PHP_VERSION}
+        composer_version: ${WORKSPACE_COMPOSER_VERSION}
+    image: laravel-app
+    container_name: php
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ${PHP_WORKSPACE}:/var/www
+      - ~/.ssh:/home/${WORKSPACE_USER}/.ssh:ro
+      - ./cache/composer:/home/${WORKSPACE_USER}/.composer/cache
+      - ./config/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - vscode_workspace_data:/home/${WORKSPACE_USER}/.vscode-server
+    networks:
+      - app-network
+
+  #Nginx Service
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    tty: true
+    ports:
+      - "${WEB_SERVER_HTTP_PORT}:80"
+      - "${WEB_SERVER_HTTPS_PORT}:443"
+    volumes:
+      - ${PHP_WORKSPACE}:/var/www
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+      - ./config/nginx/certs:/etc/nginx/certs
+    entrypoint:
+      - "nginx"
+    command: [ "-g", "daemon off;" ]
+    networks:
+      app-network:
+        aliases:
+          - php_api.docker
+
+  #MySQL Service
+  mysql:
+    image: ${DATABASE_IMAGE}:${DATABASE_VERSION}
+    container_name: mysql
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+      TZ: Asia/Yangon
+    volumes:
+      - ${DATABASE_STORE}:/var/lib/mysql/
+      - ./config/mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - app-network
+
+  #PHP myadmin service
+  phpmyadmin:
+    image: phpmyadmin:${PHPMYADMIN_VER}
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 0
+      PMA_USER: root
+      PMA_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      HIDE_PHP_VERSION: "true"
+    ports:
+      - "${PHPMYADMIN_PORT}:80"
+    networks:
+      - app-network
+
+  # Redis service
+  redis:
+    image: redis:${REDIS_VERSION}
+    container_name: redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - redis_data:/var/lib/redis/
+    networks:
+      - app-network
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  vscode_workspace_data:
+    driver: local
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
