@@ -33,6 +33,14 @@ _Note: Replace `/home/user/Development` with the path to look for projects. Your
 ```
 docker-compose up -d php nginx mysql redis
 ```
+- Run docker service for node project
+```
+docker-compose up -d nodejs mysql
+```
+- Run docker service for golang project
+```
+docker-compose up -d golang mysql
+```
 
 - To enter php workspace
 ```
@@ -47,7 +55,7 @@ root@13fd9eaabfac:/# mysql -p
 Enter password:
 ```
 ## Author
-** Nan Oo Hlaing (noob programmer) **
+** Nan Oo Hlaing (amateur programmer) **
 
 ## Show your support
 
