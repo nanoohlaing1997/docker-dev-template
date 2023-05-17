@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  #PHP Service
+  # PHP Service
   php:
     build:
       context: .
@@ -27,7 +27,7 @@ services:
     networks:
       - app-network
 
-  #Nginx Service
+  # Nginx Service
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -48,7 +48,7 @@ services:
         aliases:
           - php_api.docker
 
-  #MySQL Service
+  # MySQL Service
   mysql:
     image: ${DATABASE_IMAGE}:${DATABASE_VERSION}
     container_name: mysql
@@ -66,7 +66,7 @@ services:
     networks:
       - app-network
 
-  #PHP myadmin service
+  # PHP myadmin service
   phpmyadmin:
     image: phpmyadmin:${PHPMYADMIN_VER}
     container_name: phpmyadmin
@@ -95,6 +95,52 @@ services:
     networks:
       - app-network
 
+  # Nodejs service
+  nodejs:
+    build:
+      context: .
+      dockerfile: node/Dockerfile
+      args:
+        NODE_VERSION: ${NODE_VERSION}
+        Y_V: ${YARN_VERSION}
+    container_name: nodejs
+    tty: true
+    ports:
+      - "3000:3000"
+      - "4200:4200"
+    volumes:
+      - ${NODE_WORKSPACE}:/var/www
+      - ~/.ssh:/home/node/.ssh:ro
+      - ./cache/npm:/home/node/.npm
+      - ./cache/yarn:/home/node/.yarn
+      - vscode_nodejs_data:/home/node/.vscode-server
+    networks:
+      - app-network
+
+  # Golang service
+  golang:
+    build:
+      context: .
+      dockerfile: golang/Dockerfile
+      args:
+        user: ${WORKSPACE_USER}
+        uid: 1000
+        golang_version: ${GOLANG_VERSION}
+        go_path: ${GOLANG_WORKSPACE_GOPATH}
+    image: golang
+    container_name: golang
+    tty: true
+    working_dir: /var/www
+    volumes:
+      - ${GO_PATH_DATA}:${GOLANG_WORKSPACE_GOPATH}
+      - ${GOLANG_WORKSPACE}:/var/www
+      - vscode_golang_data:/home/${WORKSPACE_USER}/.vscode-server
+    ports:
+      - "8008:8008"
+      - "9009:9009"
+    networks:
+      - app-network
+
 #Docker Networks
 networks:
   app-network:
@@ -107,4 +153,10 @@ volumes:
   db_data:
     driver: local
   redis_data:
+    driver: local
+  go_path_data:
+    driver: local
+  vscode_nodejs_data:
+    driver: local
+  vscode_golang_data:
     driver: local
