@@ -1,6 +1,6 @@
-<h1 align="center"> Welcome to Laravel Docker Template </h1>
+<h1 align="center"> Welcome to My Docker Template For Development Enviroment </h1>
 
-# docker images for php, mysql, nginx, redis
+# docker images for php, golang, node, mysql, nginx, redis, rabbitmq
 Custom docker workspace
 
 ### Requirement
@@ -31,7 +31,7 @@ _Note: Replace `/home/user/Development` with the path to look for projects. Your
 
 - Run docker services for laravel project
 ```
-docker-compose up -d php nginx mysql redis
+docker-compose up -d php nginx mysql redis rabbitmq
 ```
 - Run docker service for node project
 ```
@@ -54,6 +54,14 @@ docker-compose exec mysql bash
 root@13fd9eaabfac:/# mysql -p
 Enter password:
 ```
+- Rabbitmq config
+```
+host can be image name ( rabbitmq )
+port = 5672
+username = guest
+password = guest
+```
+
 ## Author
 ** Nan Oo Hlaing (amateur programmer) **
 

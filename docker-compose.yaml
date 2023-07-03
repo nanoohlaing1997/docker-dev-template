@@ -141,6 +141,28 @@ services:
     networks:
       - app-network
 
+  # Rabbitmq service
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: rabbitmq/Dockerfile
+      args:
+        RABBITMQ_VERSION: ${RABBITMQ_VERSION}
+    container_name: rabbitmq
+    image: rabbitmq
+    ports:
+      - "${RABBITMQ_NODE_HOST_PORT}:5672"
+      - "${RABBITMQ_MANAGEMENT_HTTP_HOST_PORT}:15672"
+      - "${RABBITMQ_MANAGEMENT_HTTPS_HOST_PORT}:15671"
+    environment:
+      SERVICE_NAME: rabbitmq
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - ${RABBITMQ_STORE}:/var/lib/rabbitmq
+    networks:
+      - app-network
+
 #Docker Networks
 networks:
   app-network:
@@ -159,4 +181,6 @@ volumes:
   vscode_nodejs_data:
     driver: local
   vscode_golang_data:
+    driver: local
+  rabbitmq_data:
     driver: local
