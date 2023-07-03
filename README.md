@@ -1,6 +1,6 @@
 <h1 align="center"> Welcome to Laravel Docker Template </h1>
 
-# docker images for php, mysql, nginx, redis
+# docker images for php, mysql, nginx, redis, golang, node, rabbitmq
 Custom docker workspace
 
 ### Requirement
