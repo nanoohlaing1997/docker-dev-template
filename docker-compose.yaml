@@ -141,6 +141,28 @@ services:
     networks:
       - app-network
 
+  # Python service
+  python:
+    build:
+      context: .
+      dockerfile: python/Dockerfile
+      args:
+        user: ${WORKSPACE_USER}
+        uid: 1000
+        python_version: ${PYTHON_VERSION}
+    image: python
+    container_name: python
+    tty: true
+    working_dir: /var/www
+    volumes:
+      - ${PYTHON_WORKSPACE}:/var/www
+      - vscode_python_data:/home/${WORKSPACE_USER}/.vscode-server
+    ports:
+      - "8081:8081"
+      - "9091:9091"
+    networks:
+      - app-network
+
   # Rabbitmq service
   rabbitmq:
     build:
@@ -181,6 +203,8 @@ volumes:
   vscode_nodejs_data:
     driver: local
   vscode_golang_data:
+    driver: local
+  vscode_python_data:
     driver: local
   rabbitmq_data:
     driver: local

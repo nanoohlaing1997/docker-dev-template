@@ -2,7 +2,7 @@ ARG golang_version=1.16
 FROM golang:$golang_version
 
 # Arguments defined in docker-compose.yml
-ARG user=kore
+ARG user=noh
 ARG uid=1000
 ARG go_path=/var/www/project
 
