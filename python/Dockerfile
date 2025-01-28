@@ -2,6 +2,11 @@
 ARG PYTHON_VERSION=3.10-slim
 FROM python:${PYTHON_VERSION}
 
+# Install sudo
+RUN apt-get update && apt-get install -y sudo && \
+	echo 'noh ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+
 # Use arguments for user configuration
 ARG USER=noh
 ARG UID=1000
